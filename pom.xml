@@ -50,6 +50,12 @@
 			<artifactId>spring-ai-vector-store</artifactId>
 		</dependency>
 
+		<!-- Advisors de RAG (QuestionAnswerAdvisor, etc.) -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-vector-store-advisor</artifactId>
+		</dependency>
+
 		<!-- Lector de documentos: PDF, DOCX, PPTX, TXT, HTML, etc. via Apache Tika -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>

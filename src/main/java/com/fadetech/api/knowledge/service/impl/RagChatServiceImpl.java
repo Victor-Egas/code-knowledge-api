@@ -1,12 +1,10 @@
 package com.fadetech.api.knowledge.service.impl;
 
-
 import com.fadetech.api.knowledge.handler.ChatServiceException;
 import com.fadetech.api.knowledge.model.ChatResponse;
-import com.fadetech.api.knowledge.service.ChatService;
+import com.fadetech.api.knowledge.service.RagChatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,23 +13,21 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class ChatServiceImpl implements ChatService {
+public class RagChatServiceImpl implements RagChatService {
 
-    private static final Logger log = LoggerFactory.getLogger(ChatServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(RagChatServiceImpl.class);
 
-    private final ChatClient chatClient;
-    private final ChatMemory chatMemory;
+    private final ChatClient ragChatClient;
 
-    public ChatServiceImpl(@Qualifier("chatClient") ChatClient chatClient, ChatMemory chatMemory) {
-        this.chatClient = chatClient;
-        this.chatMemory = chatMemory;
+    public RagChatServiceImpl(@Qualifier("ragChatClient") ChatClient ragChatClient) {
+        this.ragChatClient = ragChatClient;
     }
 
     @Override
     public Mono<ChatResponse> generarRespuesta(String prompt, String conversationId) {
-        log.debug("Generando respuesta para conversationId={}, prompt={}", conversationId, prompt);
+        log.debug("Generando respuesta RAG para conversationId={}, prompt={}", conversationId, prompt);
 
-        return chatClient.prompt()
+        return ragChatClient.prompt()
                 .user(prompt)
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .stream()
@@ -39,29 +35,25 @@ public class ChatServiceImpl implements ChatService {
                 .collectList()
                 .map(tokens -> String.join("", tokens))
                 .map(respuesta -> ChatResponse.of(prompt, respuesta))
-                .doOnError(ex -> log.error("Error consultando al modelo", ex))
+                .doOnError(ex -> log.error("Error consultando al modelo con RAG", ex))
                 .onErrorMap(ex -> new ChatServiceException(
-                        "No se pudo generar una respuesta. Verifica que Ollama este corriendo.", ex));
+                        "No se pudo generar una respuesta con RAG. Verifica que Ollama este corriendo "
+                                + "y que haya documentos indexados.", ex));
     }
 
     @Override
     public Flux<String> generarRespuestaStream(String prompt, String conversationId) {
-        log.debug("Generando respuesta en streaming para conversationId={}, prompt={}", conversationId, prompt);
+        log.debug("Generando respuesta RAG en streaming para conversationId={}, prompt={}", conversationId, prompt);
 
-        return chatClient.prompt()
+        return ragChatClient.prompt()
                 .user(prompt)
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .stream()
                 .content()
-                .doOnError(ex -> log.error("Error en streaming del modelo", ex))
+                .doOnError(ex -> log.error("Error en streaming RAG del modelo", ex))
                 .onErrorMap(ex -> new ChatServiceException(
-                        "No se pudo generar una respuesta en streaming. Verifica que Ollama este corriendo.", ex));
-    }
-
-    @Override
-    public void limpiarConversacion(String conversationId) {
-        log.debug("Limpiando historial de conversationId={}", conversationId);
-        chatMemory.clear(conversationId);
+                        "No se pudo generar una respuesta en streaming con RAG. Verifica que Ollama "
+                                + "este corriendo y que haya documentos indexados.", ex));
     }
 
 }

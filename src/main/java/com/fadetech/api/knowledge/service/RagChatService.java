@@ -4,18 +4,14 @@ import com.fadetech.api.knowledge.model.ChatResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ChatService {
+/**
+ * Igual que ChatService, pero las respuestas se generan buscando contexto
+ * relevante en los documentos indexados en el VectorStore (RAG).
+ */
+public interface RagChatService {
 
-    /**
-     * Genera una respuesta completa (no streaming) para el prompt dado.
-     */
     Mono<ChatResponse> generarRespuesta(String prompt, String conversationId);
 
-    /**
-     * Genera la respuesta en forma de stream, token por token.
-     */
     Flux<String> generarRespuestaStream(String prompt, String conversationId);
-
-    void limpiarConversacion(String conversationId);
 
 }
