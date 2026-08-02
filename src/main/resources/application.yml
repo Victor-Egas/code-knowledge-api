@@ -11,3 +11,11 @@ spring:
         options:
           model: llama3.2
           temperature: 0.7
+      embedding:
+        options:
+          # Modelo dedicado a generar embeddings, distinto del de chat.
+          # Hay que descargarlo aparte: ollama pull nomic-embed-text
+          model: nomic-embed-text
+  webflux:
+    multipart:
+      max-in-memory-size: 10MB
