@@ -44,10 +44,16 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- Base de datos vectorial en memoria (SimpleVectorStore) -->
 		<dependency>
-			<groupId>io.github.resilience4j</groupId>
-			<artifactId>resilience4j-spring-boot2</artifactId>
-			<version>1.7.0</version>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-vector-store</artifactId>
+		</dependency>
+
+		<!-- Lector de documentos: PDF, DOCX, PPTX, TXT, HTML, etc. via Apache Tika -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-tika-document-reader</artifactId>
 		</dependency>
 
 		<dependency>
